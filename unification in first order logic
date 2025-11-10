@@ -113,3 +113,20 @@ x = parse("p(b, X, f(g(Z)))")
 y = parse("p(Z, f(Y), f(Y))")
 
 unify(x, y)
+
+OUTPUT:
+Question: S = { p(b, X, f(g(Z))); p(Z, f(Y), f(Y)) }
+
+Step 1: subst θ = { Z/b }
+          S = { p(b, X, f(g(b))); p(b, f(Y), f(Y)) }
+
+Step 2: subst θ = { X/f(Y) }
+          S = { p(b, f(Y), f(g(b))); p(b, f(Y), f(Y)) }
+
+Step 3: subst θ = { Y/g(b) }
+          S = { p(b, f(Y), f(g(b))); p(b, f(g(b)), f(g(b))) }
+
+S = { p(b, f(Y), f(g(b))); p(b, f(g(b)), f(g(b))) }
+θ = { Z/b, X/f(Y), Y/g(b) }
+(Unified Successfully)
+{'Z': 'b', 'X': ('f', ['Y']), 'Y': ('g', ['b'])}
