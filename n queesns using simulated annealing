@@ -1,0 +1,73 @@
+import random
+import math
+def calculate_cost(state):
+    """Count the number of attacking queen pairs."""
+    cost = 0
+    n = len(state)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if state[i] == state[j] or abs(state[i] - state[j]) == abs(i - j):
+                cost += 1
+    return cost
+def generate_all_neighbors(state):
+    """Generate neighbors by swapping any two queens."""
+    neighbors = []
+    n = len(state)
+    for i in range(n):
+        for j in range(i + 1, n):
+            neighbor = state[:]
+            neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
+            neighbors.append(neighbor)
+    return neighbors
+def simulated_annealing(initial_state, T=100, alpha=0.95, stopping_T=0.1, max_iter=1000):
+    current_state = initial_state
+    current_cost = calculate_cost(current_state)
+    best_state = current_state
+    best_cost = current_cost
+    iteration = 0
+   print(f"\nInitial state: {current_state}, Attacking pairs: {current_cost}\n")
+    while T > stopping_T and iteration < max_iter:
+        neighbors = generate_all_neighbors(current_state)
+        print(f"Temperature: {T:.4f}")
+        print(f"Current state: {current_state}, Attacking pairs: {current_cost}")
+        print("Neighbors and their costs:")
+        for nb in neighbors:
+            print(f"Neighbor: {nb}, Attacking pairs: {calculate_cost(nb)}")
+        # Choose a random neighbor
+        neighbor = random.choice(neighbors)
+        neighbor_cost = calculate_cost(neighbor)
+        delta = neighbor_cost - current_cost
+        if delta <= 0:
+            # Better solution
+            current_state = neighbor
+            current_cost = neighbor_cost
+            reason = "better or equal"
+            if current_cost < best_cost:
+                best_state = current_state
+                best_cost = current_cost
+        else:
+            # Accept with probability e^(-delta/T)
+            prob = math.exp(-delta / T)
+            if random.random() < prob:
+                current_state = neighbor
+                current_cost = neighbor_cost
+                reason = f"worse accepted (p={prob:.4f})"
+            else:
+                reason = "worse rejected"
+        print(f"Selected: {current_state}, Attacking pairs: {current_cost} ({reason})\n")
+        if best_cost == 0:
+            print("Found a solution with ZERO attacking pairs!\n")
+            break
+        T *= alpha
+        iteration += 1
+    print(f"Final solution: {best_state}, Attacking pairs: {best_cost}\n")
+    return best_state, best_cost
+n = 4
+initial_state = [3, 1, 2, 0]
+simulated_annealing(initial_state)
+
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
